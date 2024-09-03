@@ -5,4 +5,5 @@ from . import views
 
 urlpatterns = [
     path('',views.index, name='index'),
+    path('fetch_titles/', views.fetch_titles, name='fetch_titles'),
 ]

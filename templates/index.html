@@ -4,16 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reddit Title Fetcher</title>
-    <link rel="stylesheet" href="/static/css/style.css">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
     <div class="container">
         <h1>Reddit Title Fetcher</h1>
         <form id="communityForm">
+            {% csrf_token %}
             <input type="text" id="community" name="community" placeholder="Enter the community name" required>
             <button type="submit">Submit</button>
         </form>
         <div id="results"></div>
     </div>
+    <script>
+        document.getElementById('communityForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const community = document.getElementById('community').value;
+            fetch('/fetch_titles/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: `community=${community}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultsDiv = document.getElementById('results');
+                resultsDiv.innerHTML = '';
+                data.forEach(title => {
+                    const titleElement = document.createElement('p');
+                    titleElement.textContent = title;
+                    resultsDiv.appendChild(titleElement);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+        });
+    </script>
 </body>
 </html>
